@@ -1,0 +1,159 @@
+---
+name: "fix-issue"
+description: "Accepts a GitHub issue ID, validates approval via labels, categorizes the work, chains to /create-feature for full implementation, and comments on the issue linking to the PR."
+license: "MIT"
+compatibility: "Requires gh CLI authenticated with the repo. Must be run from the project root."
+metadata:
+  agent: "coding"
+---
+
+# Fix Issue
+
+Accepts a GitHub issue ID, validates it's approved for work, categorizes the effort, and chains to `/create-feature` for full implementation.
+
+## Pipeline
+
+This is an automatic pipeline. Execute each step in order without stopping for confirmation or narration. When you reach step 6, chain to `/create-feature` and wait for it to complete. Do not describe the chain — execute it.
+
+### Step 1: Parse Input
+
+The issue ID is provided in the command context (the text after `/fix-issue`). **Use it directly.** Do not ask the user for it. It may be provided as:
+- A bare number: `42`
+- With a prefix: `#42` or `issue-42`
+
+Strip any non-numeric characters and extract the numeric ID. If no ID was provided in the command, *then* ask the user for it.
+
+### Step 2: Fetch Issue Details
+
+Set the repo variable (default to `avoidwork/madz` if not provided in chain context):
+```bash
+REPO="${REPO:-avoidwork/madz}"
+```
+
+```bash
+gh issue view <ID> --json title,body,labels,state,url --repo "$REPO"
+```
+
+**Check if issue is closed:** After fetching, inspect the `state` field. If `state` is `"CLOSED"`, stop and report: "Issue #<ID> is closed. No action taken."
+
+If the issue does not exist or is inaccessible, report the error and stop.
+
+### Step 3: Validate Approval
+
+Inspect the `labels` array from the issue JSON.
+
+- **If `in progress` label is present:** Stop. Inform the user that the issue is already being worked on. Provide the issue URL.
+- **If `approved` label is present:** Proceed.
+- **If neither `in progress` nor `approved` is present:** Stop. Inform the user that the issue is not approved for work. Provide the issue URL and suggest they add the label before proceeding.
+
+```
+Issue #<ID> is not approved for work.
+Label "approved" not found.
+URL: <url>
+Please add the "approved" label before requesting implementation.
+```
+
+```
+Issue #<ID> is already being worked on.
+Label "in progress" found.
+URL: <url>
+No action taken.
+```
+
+### Step 4: Set In-Progress Label
+
+Before any work begins, mark the issue as being worked on:
+
+```bash
+gh issue edit <ID> --add-label "in progress" --repo "$REPO"
+```
+
+This ensures the issue won't be picked up again by `scan-issues` and clearly marks it as being worked on. (Note: `--add-label` is idempotent — adding an already-present label is a no-op.)
+
+### Step 5: Categorize the Work
+
+Inspect the labels for a categorization tag. Priority order:
+
+1. `bug` — defect or unexpected behavior
+2. `feature` — new capability
+3. `chore` — maintenance, cleanup, refactoring
+4. `docs` — documentation changes
+5. `test` — test coverage improvements
+
+If no categorization label is found, **default to `bug`**.
+
+### Step 6: Run create-feature
+
+**This is not a description. Execute it.**
+
+Invoke the `create-feature` skill as a chain instruction (text delegation). The `create-feature` skill will fetch the issue details itself:
+
+```
+create-feature Fix issue #<ID>: <brief description>. See <url> for full details.
+```
+
+Keep the chain instruction under 300 characters to avoid parsing issues.
+
+**Wait for the invocation to complete.** Do not proceed to Step 7 until the feature implementation, testing, PR creation, and archival are all done. The `create-feature` skill handles:
+
+- Proposal generation
+- Spec design
+- Task breakdown
+- Todo item creation
+- Implementation
+- Testing
+- PR creation
+- Archival
+
+**Do NOT create todo items in this skill.** Todo management is the sole responsibility of `create-feature`.
+
+**If create-feature fails:** Log the error, skip Step 7 (commenting), and report the failure in the final summary. Do not attempt to recover.
+
+### Step 7: Comment on Issue
+
+**Skip this step if create-feature failed.** If create-feature failed (per Step 6 error handling), do not attempt to comment — the PR was never created.
+
+Extract the PR number from the `create-feature` invocation result. The PR number appears in the output as `#<NUMBER>` (e.g., "PR #456 created"). Parse it:
+
+```bash
+# Extract PR number from create-feature result — look for "PR #<NUMBER>" pattern
+PR_NUMBER=$(echo "$CREATE_FEATURE_OUTPUT" | grep -oP 'PR #\K\d+' | head -1)
+if [ -z "$PR_NUMBER" ]; then
+  # Fallback: look for any standalone number after "Fixed in #"
+  PR_NUMBER=$(echo "$CREATE_FEATURE_OUTPUT" | grep -oP 'Fixed in #\K\d+' | head -1)
+fi
+
+if [ -z "$PR_NUMBER" ]; then
+  echo "WARNING: Could not extract PR number from create-feature output. Skipping comment."
+else
+  gh issue comment <ID> --body "Fixed in #${PR_NUMBER}." --repo "$REPO"
+fi
+```
+
+If the PR number cannot be extracted or the comment fails, note it in the final report but do not stop.
+
+## Error Handling
+
+- **Issue not found:** Report the error clearly with the provided ID.
+- **Not authenticated:** Suggest running `gh auth login`.
+- **Network error:** Retry once, then report the failure.
+- **`/create-feature` failure:** Report the specific failure and continue with what was accomplished. Never leave the queue half-done.
+
+## Example
+
+```
+User: fix-issue 123
+
+Agent: Fetching issue #123...
+  Title: "Crash on empty input"
+  Labels: approved, bug
+  State: open
+
+  Issue is approved. Category: bug.
+
+  Invoking create-feature...
+
+  [waits for create-feature to complete]
+
+  Commenting on issue #123 → Fixed in #126.
+```

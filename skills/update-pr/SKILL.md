@@ -1,0 +1,154 @@
+---
+name: "update-pr"
+description: "Update an existing PR's title and description by scanning project rules for conventions and the PR template, synthesizing both from the delta between the branch and target, then applying changes via 'gh api' (gh pr edit fails in this repo)."
+license: "MIT"
+compatibility: "Requires gh CLI authenticated with a repo that has .github/PULL_REQUEST_TEMPLATE.md."
+metadata:
+  version: "1.0"
+  agent: "coding"
+---
+
+# Update PR
+
+Update an existing pull request's title and description following project conventions.
+
+## When to Use
+
+- The user asks to update a PR's title or description
+- A PR was opened with a generic or incomplete title/description
+- The user wants to align PR metadata with project rules
+
+## Steps
+
+1. **Identify the PR**
+
+   The PR number is provided in the chain context (the text after `/update-pr`). If no PR number is provided, report an error and stop — this skill requires a specific PR to update.
+
+   Confirm the PR exists:
+   ```bash
+   gh pr view <PR_NUMBER> --json title,state,url --repo avoidwork/madz
+   ```
+
+2. **Scan Project Rules**
+
+   Use the `scanAgents` tool to scan for and read the project rules file:
+
+   ```
+   scanAgents
+   ```
+
+   Extract:
+   - **Commit style** (Conventional Commits format from section 5.1)
+   - **PR template** requirements from section 5.4 (and `.github/PULL_REQUEST_TEMPLATE.md` if it exists)
+   - Any project-specific rules that affect the PR description
+
+3. **Read the PR template**
+
+   ```bash
+   cat .github/PULL_REQUEST_TEMPLATE.md
+   ```
+
+   If the file doesn't exist, construct a reasonable description with: Description, Type of Change, Testing, Coverage, Checklist.
+
+4. **Gather the full delta**
+
+   You must collect the complete picture — every commit and every file change between the branch and its target. Do not rely on the most recent commit alone.
+
+   ```bash
+   # Get all commits on the branch (oldest first)
+   git log --reverse <base>..<head> --oneline --no-decorate
+
+   # Get the full diff stats (files changed, lines added/removed)
+   git diff <base>..<head> --stat
+
+   # Get the full diff (for detailed change analysis) — NOTE: On large branches, this may produce very large output.
+   # If output exceeds ~50,000 characters, use --stat only and note "Large delta — full diff truncated."
+   git diff <base>..<head>
+   ```
+
+   Replace `<base>` with the PR's base branch (usually `main`) and `<head>` with the branch's HEAD commit. Use `gh pr view <number> --json baseRefName,headRefName` to get these values if unsure.
+
+   From this data, identify:
+   - **All files changed** and what kind of change each represents
+   - **All commits** and their messages (these are your primary signal for the title)
+   - **The nature of changes**: code, docs, tests, config, etc.
+
+5. **Draft the title**
+
+   Synthesize the title from the **complete delta** — all commits and all file changes. Follow Conventional Commits format: `<type>: <short description>`
+
+   **Type selection priority** (use the highest-priority type present in the delta):
+   1. `fix:` — if any commit fixes a bug
+   2. `feat:` — if any commit adds a feature
+   3. `docs:` — if only documentation/spec changes
+   4. `test:` — if only test changes
+   5. `refactor:` — if only refactoring with no behavior change
+   6. `chore:` — if only maintenance tasks
+
+   **Description selection:**
+   - If all commits share a common theme, use that as the description.
+   - If commits span multiple themes, use the **primary** theme (the one with the most commits or the most impactful change).
+   - Keep it under 72 characters. Be specific — avoid vague phrases like "update" or "changes."
+
+   Examples:
+   - `fix: resolve agent stalling on empty conversation history`
+   - `feat: add cron-based auto-reflection scheduling`
+   - `docs: add compliance framework and borderline escalation rules to safety guidelines`
+
+6. **Draft the description**
+
+   Synthesize the description from the **complete delta** — all commits and all file changes. Fill out every section of the PR template. Never leave a section blank — use `N/A` if not applicable.
+
+   **Description body:**
+   - Write a concise 1-3 sentence summary of what changed across the **entire branch**, not just the last commit.
+   - Reference all files changed and the nature of each change.
+   - If the branch has multiple commits, mention the scope: e.g., "This change adds X and also updates Y to align with Z."
+
+   **Template sections:**
+   - **Type of Change:** Check the box that matches the highest-priority type (same priority as title: fix > feat > docs > test > refactor > chore). If multiple types apply, check the highest-priority one.
+   - **Testing:** Describe tests written/run and their coverage. Use "N/A" for doc-only or config-only changes.
+   - **Coverage:** Confirm 100% line coverage maintained (check the box if no code changes or if coverage is maintained).
+   - **Checklist:** Check all boxes if no violations. Uncheck any that don't apply.
+
+7. **Apply via `gh api`**
+
+   **Never use `gh pr edit`** — it fails in this repo. Use the GitHub API instead:
+
+   ```bash
+   # Determine repo from git remote
+   REPO=$(git remote get-url origin | sed 's/.*:\(.*\)\.git$/\1/' | sed 's/.*\///')
+   OWNER=$(echo "$REPO" | cut -d'/' -f1)
+   PROJECT=$(echo "$REPO" | cut -d'/' -f2)
+
+   gh api "repos/$OWNER/$PROJECT/pulls/<PR_NUMBER>" \
+     -f title="<DRAFTED_TITLE>" \
+     -f body="<DRAFTED_BODY>"
+   ```
+
+   **Handle API errors:** If the API call returns a non-200 status, report the error and stop. Common errors:
+   - **403 Forbidden:** Check authentication and permissions
+   - **404 Not Found:** Verify PR number and repo
+   - **422 Unprocessable Entity:** Check title/body format (title under 72 chars, body not empty)
+
+   **Coverage verification:** The skill instructs to "Confirm 100% line coverage maintained" but there's no way to verify this without running tests. If code changes were made, run `npm run coverage` and check the output. If no code changes were made (docs-only, config-only), note "No code changes — coverage N/A."
+
+8. **Confirm**
+
+   Show the user the updated PR URL and a summary of what changed.
+
+## Example
+
+```bash
+gh api repos/avoidwork/madz/pulls/214 \
+  -f title="docs: rename OpenSpec change directory and archive core-architecture-spec" \
+  -f body="## Description\n\nRenamed the \`core-architecture-spec\` OpenSpec change...\n\n## Type of Change\n\n- [x] Documentation update\n- [x] Refactor (no functional changes)\n\n## Testing\n\nN/A — spec-only change, no code modified.\n\n## Coverage\n\n- [x] 100% line coverage maintained (no code changes)\n\n## Checklist\n\n- [x] \`npm run lint\` passes\n- [x] Tests pass with 100% line coverage\n- [x] No forbidden patterns used\n- [x] Conventional Commit style applied\n"
+```
+
+## Guardrails
+
+- Always scan project rules with `scanAgents` before drafting — conventions may vary per project
+- Synthesize title and description from the delta between branch and target — take all changes into account
+- Never leave PR template sections blank; use `N/A`
+- Use `gh api`, never `gh pr edit`
+- Keep titles under 72 characters (Conventional Commits standard)
+- If the PR doesn't exist or the user can't identify it, ask for clarification
