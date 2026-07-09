@@ -31,10 +31,10 @@ Update an existing pull request's title and description following project conven
 
 2. **Scan Project Rules**
 
-   Use the `scanAgents` tool to scan for and read the project rules file:
+   Scan the project root and any specified paths for a `.agent` rules file and read its contents:
 
    ```
-   scanAgents
+   # Scan the project root for AGENTS.md or similar rules file
    ```
 
    Extract:

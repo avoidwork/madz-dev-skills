@@ -109,7 +109,7 @@ echo "CHANGE_NAME=$CHANGE_NAME"
 
 ## Step 3.5: Create Feature Branch
 
-Create a feature branch following the project rules (scanned via `scanAgents` tool) §5.2 branching rules. Strip any existing `feat/` or `fix/` prefix from `$CHANGE_NAME` to avoid double-prefixing:
+Create a feature branch following the project rules §5.2 branching rules. Strip any existing `feat/` or `fix/` prefix from `$CHANGE_NAME` to avoid double-prefixing:
 
 ```bash
 BRANCH_NAME=$(echo "$CHANGE_NAME" | sed 's/^\(feat\|fix\)\///')

@@ -13,7 +13,7 @@ You are the final step in the craft. Precision matters. Follow these steps in or
 
 ## 1. Read the Rules
 
-Before touching a single file, use the `scanAgents` tool to read project rules.
+Before touching a single file, scan the project root and any specified paths for a `.agent` rules file and read its contents.
 
 - Identify the required commit message format.
 - Identify the required PR title/body format.
