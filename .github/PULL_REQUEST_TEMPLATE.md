@@ -22,7 +22,5 @@ Describe the tests you wrote/run and their coverage. Use "N/A" if not applicable
 
 ## Checklist
 
-- [ ] `npm run lint` passes
-- [ ] Tests pass with maintained line coverage
 - [ ] No forbidden patterns used
 - [ ] Conventional Commit style applied
