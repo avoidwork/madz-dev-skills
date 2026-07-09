@@ -12,14 +12,6 @@ Describe the changes in 1-3 sentences. Use "N/A" if not applicable.
 - [ ] Performance improvement
 - [ ] CI / build / tooling
 
-## Testing
-
-Describe the tests you wrote/run and their coverage. Use "N/A" if not applicable.
-
-## Coverage
-
-- [ ] Line coverage maintained
-
 ## Checklist
 
 - [ ] No forbidden patterns used
