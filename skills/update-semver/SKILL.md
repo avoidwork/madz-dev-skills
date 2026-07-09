@@ -117,7 +117,7 @@ Verify the change:
 jq -r '.version' package.json
 ```
 
-## Step 7: Install and Generate Changelog
+## Step 7: Install, Build, and Generate Changelog
 
 ```bash
 npm i --ignore-scripts
@@ -125,10 +125,22 @@ if [ $? -ne 0 ]; then
   echo "ERROR: npm install failed. Aborting."
   exit 1
 fi
+
+# Run build if the script exists — MUST succeed if present
+if jq -e '.scripts.build' package.json > /dev/null 2>&1; then
+  echo "Build script detected. Running build..."
+  npm run build
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Build script failed. Aborting — cannot release a broken build."
+    exit 1
+  fi
+  echo "Build succeeded."
+fi
+
 npm run changelog
 ```
 
-This installs dependencies (ensuring lockfile is current) and generates an updated `CHANGELOG.md` using `auto-changelog`. The `--ignore-scripts` flag prevents postinstall scripts from running during the version bump. If `npm i` fails, abort immediately — do not proceed to commit a broken state.
+This installs dependencies (ensuring lockfile is current), runs `build` if the project has one (**must succeed** if present — a broken build is a broken release), and generates an updated `CHANGELOG.md` using `auto-changelog`. The `--ignore-scripts` flag prevents postinstall scripts from running during the version bump. If `npm i` fails, abort immediately — do not proceed to commit a broken state.
 
 ## Step 8: Verify Branch and Run commit-push
 
@@ -144,7 +156,7 @@ echo "Branch: $CURRENT_BRANCH"
 ```
 
 Then trigger the `commit-push` skill. This will:
-1. Use the `scanAgents` tool to read project rules
+1. Scan for AGENTS.md to read project rules
 2. Stage all changes
 3. Commit with a conventional commit message (e.g., `chore: release v1.3.8`)
 4. Push to the remote
