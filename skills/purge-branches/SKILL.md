@@ -1,7 +1,7 @@
 ---
 name: "purge-branches"
 description: "Runs npm run purge-branches to delete local branches other than main. Use when the user wants to clean up stale branches without switching branches or pulling."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with npm. Must be run from the project root directory."
 metadata:
   agent: "coding"

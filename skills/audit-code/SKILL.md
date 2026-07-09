@@ -1,7 +1,7 @@
 ---
 name: "audit-code"
 description: "Audits each directory in ./src for bugs, security vulnerabilities, and performance issues sequentially. Generates one consolidated issue per directory via /create-issue."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Node.js project with ./src directory structure"
 metadata:
   version: "2.2.0"
