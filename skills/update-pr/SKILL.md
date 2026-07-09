@@ -1,7 +1,7 @@
 ---
 name: "update-pr"
 description: "Update an existing PR's title and description by scanning project rules for conventions and the PR template, synthesizing both from the delta between the branch and target, then applying changes via 'gh api' (gh pr edit fails in this repo)."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with a repo that has .github/PULL_REQUEST_TEMPLATE.md."
 metadata:
   version: "1.0"
@@ -31,10 +31,10 @@ Update an existing pull request's title and description following project conven
 
 2. **Scan Project Rules**
 
-   Use the `scanAgents` tool to scan for and read the project rules file:
+   Scan the project root and any specified paths for a `.agent` rules file and read its contents:
 
    ```
-   scanAgents
+   # Scan the project root for AGENTS.md or similar rules file
    ```
 
    Extract:

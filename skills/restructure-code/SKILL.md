@@ -1,7 +1,7 @@
 ---
 name: "restructure-code"
 description: "Audits each directory in ./src for opportunities to restructure directories to align with community best practices & better organization in general. Generates one consolidated issue per directory via /create-issue."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Node.js project with ./src directory structure"
 metadata:
   version: "1.0.0"

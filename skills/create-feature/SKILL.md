@@ -1,7 +1,7 @@
 ---
 name: create-feature
 description: "Orchestrates a full feature lifecycle: receive goals, synthesize detailed specs, propose via OpenSpec, commit & push, apply tasks, audit results, update PR, and post audit results as a comment."
-license: MIT
+license: "BSD 3-Clause"
 compatibility: "Requires Node.js 24+, npm, git with remote access, gh CLI, openspec CLI, and a project root with openspec/ directory. When invoked as a sub-agent, requires a 30–60 minute timeout — the full pipeline (spec → implement → test → archive → PR) can take that long."
 metadata:
   agent: coding
@@ -109,7 +109,7 @@ echo "CHANGE_NAME=$CHANGE_NAME"
 
 ## Step 3.5: Create Feature Branch
 
-Create a feature branch following the project rules (scanned via `scanAgents` tool) §5.2 branching rules. Strip any existing `feat/` or `fix/` prefix from `$CHANGE_NAME` to avoid double-prefixing:
+Create a feature branch following the project rules §5.2 branching rules. Strip any existing `feat/` or `fix/` prefix from `$CHANGE_NAME` to avoid double-prefixing:
 
 ```bash
 BRANCH_NAME=$(echo "$CHANGE_NAME" | sed 's/^\(feat\|fix\)\///')

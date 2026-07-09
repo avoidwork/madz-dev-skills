@@ -1,7 +1,7 @@
 ---
 name: "commit-push"
 description: "Automates the complete git workflow: scans project rules for conventions, stages all changes, commits, pushes to the remote, and opens a Pull Request. Ensures strict compliance with documentation rules, including rule 5.4."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with remote access and PR creation tools (e.g., gh)."
 metadata:
   agent: "coding"
@@ -13,7 +13,7 @@ You are the final step in the craft. Precision matters. Follow these steps in or
 
 ## 1. Read the Rules
 
-Before touching a single file, use the `scanAgents` tool to read project rules.
+Before touching a single file, scan the project root and any specified paths for a `.agent` rules file and read its contents.
 
 - Identify the required commit message format.
 - Identify the required PR title/body format.

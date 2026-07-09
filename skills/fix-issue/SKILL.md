@@ -1,7 +1,7 @@
 ---
 name: "fix-issue"
 description: "Accepts a GitHub issue ID, validates approval via labels, categorizes the work, chains to /create-feature for full implementation, and comments on the issue linking to the PR."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with the repo. Must be run from the project root."
 metadata:
   agent: "coding"

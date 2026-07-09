@@ -1,7 +1,7 @@
 ---
 name: "audit-skill"
 description: "Audits Agent Skills SKILL.md files against the protocol specification and best practices. Identifies issues across 10 categories: schema violations, naming, description quality, structure, progressive disclosure, file references, best practices, calibration, content quality, and optional directories. Produces a structured report with severity levels and actionable fixes."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires Node.js 24+. Reads SKILL.md files from any directory. No network access needed."
 metadata:
   version: "1.0.0"
@@ -166,7 +166,7 @@ Check usage of optional directories:
    # Extract frontmatter (between first and second ---)
    sed -n '1,/^---$/p' "$SKILL_PATH/SKILL.md" | tail -n +2 | head -n -1
    ```
-   Use `jq` or a YAML parsing tool to extract fields. If no YAML parser is available, parse manually with `grep`/`sed`.
+   Parse the YAML frontmatter to extract fields. If no YAML parser is available, parse manually with `grep`/`sed`.
 3. **Read the Markdown body** — analyze structure and content:
    ```bash
    # Count lines in body (after frontmatter)

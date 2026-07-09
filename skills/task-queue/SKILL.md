@@ -1,7 +1,7 @@
 ---
 name: "task-queue"
 description: "Accept a list of tasks (JSON or natural language), execute shell commands sequentially with fail-fast logic, and report a structured summary."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with remote access and PR creation tools (e.g., gh)."
 metadata:
   agent: "coding"
@@ -32,11 +32,11 @@ Accept the task list. It may be provided as:
 
 Iterate through tasks in order. **Do not pause for user confirmation.**
 
-**Important:** This skill manages its own task tracking. Do not rely on the system prompt's todo management — use the `write_todos` tool to create and manage todo items for visibility:
+**Important:** This skill manages its own task tracking. Do not rely on the system prompt's todo management — create and manage a structured todo list for visibility:
 
 ```bash
 # Before starting, create todo items for each task
-# (Use write_todos tool with the parsed task list)
+# (Create a todo list with each task from the parsed input)
 ```
 
 For each task:

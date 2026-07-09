@@ -1,7 +1,7 @@
 ---
 name: "audit-sys-prompt"
 description: "Expert System Prompt Evaluator Agent. Analyzes, rates, and provides actionable feedback for system prompts against a 7-criteria framework. Returns structured machine-readable JSON output with weighted scores, evidence-based reasoning, and harness-aware recommendations."
-license: "MIT"
+license: "BSD 3-Clause"
 compatibility: "Requires a capable LLM for evaluation. Designed for AI harness environments with tool calling, memory layers, and guardrails."
 metadata:
   agent: "coding"
