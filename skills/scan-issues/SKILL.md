@@ -4,7 +4,7 @@ description: "Scans GitHub for open issues labeled 'approved' but not 'in progre
 license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with the avoidwork/madz repo. Must be run from the project root."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Scan & Fix Issues

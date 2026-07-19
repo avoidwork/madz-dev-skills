@@ -4,7 +4,7 @@ description: "Audits the delta between HEAD and the tag matching the current pac
 license: "BSD 3-Clause"
 compatibility: "Requires Node.js 24+, npm, git CLI with remote access, and gh CLI for PR management. Must be run from the project root directory containing package.json."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Update Semver

@@ -4,7 +4,7 @@ description: "Accepts a GitHub issue ID, validates approval via labels, categori
 license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with the repo. Must be run from the project root."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Fix Issue

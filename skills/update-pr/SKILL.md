@@ -5,7 +5,7 @@ license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with a repo that has .github/PULL_REQUEST_TEMPLATE.md."
 metadata:
   version: "1.0"
-  agent: "coding"
+  agent: coding
 ---
 
 # Update PR

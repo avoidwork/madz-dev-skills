@@ -4,7 +4,7 @@ description: "Expert System Prompt Evaluator Agent. Analyzes, rates, and provide
 license: "BSD 3-Clause"
 compatibility: "Requires a capable LLM for evaluation. Designed for AI harness environments with tool calling, memory layers, and guardrails."
 metadata:
-  agent: "coding"
+  agent: documentation
 ---
 
 # Audit System Prompt

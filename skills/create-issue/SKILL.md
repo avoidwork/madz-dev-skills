@@ -4,7 +4,7 @@ description: "Receives a user description, synthesizes it into a title and descr
 license: "BSD 3-Clause"
 compatibility: "Requires gh CLI authenticated with the repo. Must be run from the project root."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Create Issue

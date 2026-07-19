@@ -4,7 +4,7 @@ description: "Automates the complete git workflow: scans project rules for conve
 license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with remote access and PR creation tools (e.g., gh)."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Commit & Push

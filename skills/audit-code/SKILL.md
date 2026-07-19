@@ -7,7 +7,7 @@ metadata:
   version: "2.2.0"
   phase-mode: "sequential"
   target: "./src"
-  agent: "coding"
+  agent: code-review
 ---
 
 # Audit Code

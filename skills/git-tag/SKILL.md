@@ -4,7 +4,7 @@ description: "Reads package.json version, synthesizes a change description from 
 license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with remote access and a package.json with a \"version\" field in the working directory."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Git Tag

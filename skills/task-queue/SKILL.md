@@ -4,7 +4,7 @@ description: "Accept a list of tasks (JSON or natural language), execute shell c
 license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with remote access and PR creation tools (e.g., gh)."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Task Queue

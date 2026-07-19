@@ -7,7 +7,7 @@ metadata:
   version: "1.0.0"
   phase-mode: "strict-sequential"
   target: "./src"
-  agent: "coding"
+  agent: code-review
 ---
 
 # Restructure Code

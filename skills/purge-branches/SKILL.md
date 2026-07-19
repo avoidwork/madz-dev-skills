@@ -4,7 +4,7 @@ description: "Runs npm run purge-branches to delete local branches other than ma
 license: "BSD 3-Clause"
 compatibility: "Requires git CLI configured with npm. Must be run from the project root directory."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Purge Branches

@@ -4,7 +4,7 @@ description: "Builds and pushes all Docker images for the madz project by runnin
 license: "BSD 3-Clause"
 compatibility: "Requires Node.js 24+, npm, Docker CLI, and git with remote access. Must be run from the project root directory."
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Release Madz
