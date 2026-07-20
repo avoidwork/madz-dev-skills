@@ -1,13 +1,13 @@
 ---
-name: "restructure-code"
+name: restructure-code
 description: "Audits each directory in ./src for opportunities to restructure directories to align with community best practices & better organization in general. Generates one consolidated issue per directory via /create-issue."
-license: "BSD 3-Clause"
-compatibility: "Node.js project with ./src directory structure"
+license: BSD 3-Clause
+compatibility: Node.js project with ./src directory structure
 metadata:
-  version: "1.0.0"
-  phase-mode: "strict-sequential"
-  target: "./src"
-  agent: "coding"
+  version: 1.0.0
+  phase-mode: strict-sequential
+  target: ./src
+  agent: code-review
 ---
 
 # Restructure Code

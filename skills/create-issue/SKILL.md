@@ -1,10 +1,10 @@
 ---
-name: "create-issue"
-description: "Receives a user description, synthesizes it into a title and description, categorizes as 'fix' or 'feat', creates a GitHub issue, audits the codebase for actionable details, and updates the issue with findings."
-license: "BSD 3-Clause"
-compatibility: "Requires gh CLI authenticated with the repo. Must be run from the project root."
+name: create-issue
+description: Receives a user description, synthesizes it into a title and description, categorizes as 'fix' or 'feat', creates a GitHub issue, audits the codebase for actionable details, and updates the issue with findings.
+license: BSD 3-Clause
+compatibility: Requires gh CLI authenticated with the repo. Must be run from the project root.
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Create Issue

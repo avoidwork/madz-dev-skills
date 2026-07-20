@@ -1,10 +1,10 @@
 ---
-name: "release-madz"
-description: "Builds and pushes all Docker images for the madz project by running npm run docker:release:all. Runs the build as a foreground process — it takes a few minutes. Reports completion status to the user."
-license: "BSD 3-Clause"
-compatibility: "Requires Node.js 24+, npm, Docker CLI, and git with remote access. Must be run from the project root directory."
+name: release-madz
+description: Builds and pushes all Docker images for the madz project by running npm run docker:release:all. Runs the build as a foreground process — it takes a few minutes. Reports completion status to the user.
+license: BSD 3-Clause
+compatibility: Requires Node.js 24+, npm, Docker CLI, and git with remote access. Must be run from the project root directory.
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Release Madz

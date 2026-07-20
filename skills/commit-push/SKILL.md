@@ -1,10 +1,10 @@
 ---
-name: "commit-push"
-description: "Automates the complete git workflow: scans project rules for conventions, stages all changes, commits, pushes to the remote, and opens a Pull Request. Ensures strict compliance with documentation rules, including rule 5.4."
-license: "BSD 3-Clause"
-compatibility: "Requires git CLI configured with remote access and PR creation tools (e.g., gh)."
+name: commit-push
+description: Automates the complete git workflow: scans project rules for conventions, stages all changes, commits, pushes to the remote, and opens a Pull Request. Ensures strict compliance with documentation rules, including rule 5.4.
+license: BSD 3-Clause
+compatibility: Requires git CLI configured with remote access and PR creation tools (e.g., gh).
 metadata:
-  agent: "coding"
+  agent: coding
 ---
 
 # Commit & Push
