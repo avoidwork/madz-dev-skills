@@ -1,10 +1,10 @@
 ---
-name: "update-pr"
-description: "Update an existing PR's title and description by scanning project rules for conventions and the PR template, synthesizing both from the delta between the branch and target, then applying changes via 'gh api' (gh pr edit fails in this repo)."
-license: "BSD 3-Clause"
-compatibility: "Requires gh CLI authenticated with a repo that has .github/PULL_REQUEST_TEMPLATE.md."
+name: update-pr
+description: Update an existing PR's title and description by scanning project rules for conventions and the PR template, synthesizing both from the delta between the branch and target, then applying changes via 'gh api' (gh pr edit fails in this repo).
+license: BSD 3-Clause
+compatibility: Requires gh CLI authenticated with a repo that has .github/PULL_REQUEST_TEMPLATE.md.
 metadata:
-  version: "1.0"
+  version: 1.0
   agent: coding
 ---
 

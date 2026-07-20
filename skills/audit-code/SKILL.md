@@ -1,12 +1,12 @@
 ---
-name: "audit-code"
-description: "Audits each directory in ./src for bugs, security vulnerabilities, and performance issues sequentially. Generates one consolidated issue per directory via /create-issue."
-license: "BSD 3-Clause"
-compatibility: "Node.js project with ./src directory structure"
+name: audit-code
+description: Audits each directory in ./src for bugs, security vulnerabilities, and performance issues sequentially. Generates one consolidated issue per directory via /create-issue.
+license: BSD 3-Clause
+compatibility: Node.js project with ./src directory structure
 metadata:
-  version: "2.2.0"
-  phase-mode: "sequential"
-  target: "./src"
+  version: 2.2.0
+  phase-mode: sequential
+  target: ./src
   agent: code-review
 ---
 

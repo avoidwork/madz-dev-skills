@@ -1,11 +1,11 @@
 ---
-name: "audit-skill"
-description: "Audits Agent Skills SKILL.md files against the protocol specification and best practices. Identifies issues across 10 categories: schema violations, naming, description quality, structure, progressive disclosure, file references, best practices, calibration, content quality, and optional directories. Produces a structured report with severity levels and actionable fixes."
-license: "BSD 3-Clause"
-compatibility: "Requires Node.js 24+. Reads SKILL.md files from any directory. No network access needed."
+name: audit-skill
+description: Audits Agent Skills SKILL.md files against the protocol specification and best practices. Identifies issues across 10 categories: schema violations, naming, description quality, structure, progressive disclosure, file references, best practices, calibration, content quality, and optional directories. Produces a structured report with severity levels and actionable fixes.
+license: BSD 3-Clause
+compatibility: Requires Node.js 24+. Reads SKILL.md files from any directory. No network access needed.
 metadata:
-  version: "1.0.0"
-  category: "quality-assurance"
+  version: 1.0.0
+  category: quality-assurance
   agent: documentation
 ---
 

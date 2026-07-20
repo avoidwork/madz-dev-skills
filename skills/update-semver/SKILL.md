@@ -1,8 +1,8 @@
 ---
-name: "update-semver"
-description: "Audits the delta between HEAD and the tag matching the current package.json version, decides if it's a major/minor/patch bump, updates package.json, runs npm i and npm run changelog, then triggers commit-push, enables auto-merge on the PR, and announces the new version. Does NOT create a git tag — that is handled by the separate git-tag skill after the PR merges."
-license: "BSD 3-Clause"
-compatibility: "Requires Node.js 24+, npm, git CLI with remote access, and gh CLI for PR management. Must be run from the project root directory containing package.json."
+name: update-semver
+description: Audits the delta between HEAD and the tag matching the current package.json version, decides if it's a major/minor/patch bump, updates package.json, runs npm i and npm run changelog, then triggers commit-push, enables auto-merge on the PR, and announces the new version. Does NOT create a git tag — that is handled by the separate git-tag skill after the PR merges.
+license: BSD 3-Clause
+compatibility: Requires Node.js 24+, npm, git CLI with remote access, and gh CLI for PR management. Must be run from the project root directory containing package.json.
 metadata:
   agent: coding
 ---

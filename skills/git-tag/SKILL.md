@@ -1,8 +1,8 @@
 ---
-name: "git-tag"
-description: "Reads package.json version, synthesizes a change description from git history delta, creates an annotated git tag (no \"v\" prefix), and pushes it to origin."
-license: "BSD 3-Clause"
-compatibility: "Requires git CLI configured with remote access and a package.json with a \"version\" field in the working directory."
+name: git-tag
+description: Reads package.json version, synthesizes a change description from git history delta, creates an annotated git tag (no "v" prefix), and pushes it to origin.
+license: BSD 3-Clause
+compatibility: Requires git CLI configured with remote access and a package.json with a "version" field in the working directory.
 metadata:
   agent: coding
 ---
