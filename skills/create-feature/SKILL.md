@@ -19,6 +19,19 @@ Before starting, ensure:
 - `openspec` CLI is available
 - The current branch is `main` (or will be checked out at step 0)
 
+## Input Parsing
+
+The input may include a `BRANCH_TYPE` prefix (e.g., `BRANCH_TYPE=fix create-feature ...`). Extract it if present:
+
+```bash
+# Extract BRANCH_TYPE from input if provided (e.g., "BRANCH_TYPE=fix create-feature ...")
+if echo "$INPUT" | grep -qP '^BRANCH_TYPE=\w+\s+create-feature'; then
+  BRANCH_TYPE=$(echo "$INPUT" | grep -oP 'BRANCH_TYPE=\K\w+')
+  # Strip the prefix for goal parsing
+  INPUT=$(echo "$INPUT" | sed 's/^BRANCH_TYPE=\w\+\s\+create-feature\s\+//')
+fi
+```
+
 ## Input
 
 The user provides a list of goals/features in any format (natural language, JSON, markdown list, etc.). Parse and normalize them into a clean array of goal strings.
@@ -109,11 +122,25 @@ echo "CHANGE_NAME=$CHANGE_NAME"
 
 ## Step 3.5: Create Feature Branch
 
-Create a feature branch following the project rules §5.2 branching rules. Strip any existing `feat/` or `fix/` prefix from `$CHANGE_NAME` to avoid double-prefixing:
+Determine the branch type from the input context. If the input contains a reference to an issue with a known type (e.g., from `fix-issue` chain), extract it. Otherwise, default to `feat`.
+
+Valid types: `feat`, `fix`, `chore`, `docs`, `test`.
+
+Strip any existing type prefix from `$CHANGE_NAME` to avoid double-prefixing:
 
 ```bash
-BRANCH_NAME=$(echo "$CHANGE_NAME" | sed 's/^\(feat\|fix\)\///')
-git checkout -b "feat/$BRANCH_NAME"
+# Determine branch type — default to feat if not specified
+BRANCH_TYPE="${BRANCH_TYPE:-feat}"
+
+# Validate branch type
+case "$BRANCH_TYPE" in
+  feat|fix|chore|docs|test) ;;
+  *) BRANCH_TYPE="feat" ;;
+esac
+
+# Strip any existing type prefix from CHANGE_NAME to avoid double-prefixing
+BRANCH_NAME=$(echo "$CHANGE_NAME" | sed 's/^\(feat\|fix\|chore\|docs\|test\)\///')
+git checkout -b "${BRANCH_TYPE}/${BRANCH_NAME}"
 ```
 
 Verify the branch was created:

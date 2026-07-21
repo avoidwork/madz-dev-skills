@@ -86,10 +86,20 @@ If no categorization label is found, **default to `bug`**.
 
 **This is not a description. Execute it.**
 
-Invoke the `create-feature` skill as a chain instruction (text delegation). The `create-feature` skill will fetch the issue details itself:
+Map the categorized type to a conventional commit prefix for the branch name:
+
+| Category | Branch Type |
+|----------|-------------|
+| `bug`    | `fix`       |
+| `feature`| `feat`      |
+| `chore`  | `chore`     |
+| `docs`   | `docs`      |
+| `test`   | `test`      |
+
+Invoke the `create-feature` skill as a chain instruction (text delegation), passing the branch type via `BRANCH_TYPE`:
 
 ```
-create-feature Fix issue #<ID>: <brief description>. See <url> for full details.
+BRANCH_TYPE=<type> create-feature Fix issue #<ID>: <brief description>. See <url> for full details.
 ```
 
 Keep the chain instruction under 300 characters to avoid parsing issues.
