@@ -195,14 +195,15 @@ If either `LOCAL_EXISTS` or `REMOTE_EXISTS` is non-empty, the tag already exists
 
 ## Step 5: Gather Commits for Description
 
-Collect the commit messages between the previous tag and HEAD. **Filter out merge commits** (messages starting with "Merge ") as they add noise:
+Collect the commit messages between the previous tag and HEAD. **Filter out merge commits** (messages starting with "Merge ") as they add noise. Capture into `COMMITS` for use by Step 6:
 
 ```bash
 if [ -n "$PREV_TAG" ]; then
-  git log --pretty=format:"%s" "${PREV_TAG}..HEAD" | grep -v "^Merge "
+  COMMITS=$(git log --pretty=format:"%s" "${PREV_TAG}..HEAD" | grep -v "^Merge ")
 else
-  git log --pretty=format:"%s" --max-count=20 | grep -v "^Merge "
+  COMMITS=$(git log --pretty=format:"%s" --max-count=20 | grep -v "^Merge ")
 fi
+echo "COMMITS=$COMMITS" | head -c 2000
 ```
 
 ## Step 6: Synthesize the Description
@@ -222,7 +223,19 @@ Version 1.3.5 release.
 Includes a Dockerfile fix for the HOME environment variable, expanded scheduler documentation with atomicity directives, and a TUI audit fix proposal. Documentation updates cover config.yaml tracking, TUI command expansion, and scheduler documentation improvements.
 ```
 
-If no commits can be analyzed, use: `"Version ${TAG_VERSION} release."`
+Then synthesize and set `DESCRIPTION`:
+
+```bash
+if [ -z "$DESCRIPTION" ]; then
+  DESCRIPTION="Version ${TAG_VERSION} release."
+fi
+```
+
+If no commits can be analyzed, set DESCRIPTION to:
+
+```bash
+DESCRIPTION="Version ${TAG_VERSION} release."
+```
 
 ## Step 7: Create the Tag
 
