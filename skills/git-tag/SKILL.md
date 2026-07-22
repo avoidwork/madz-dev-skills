@@ -1,8 +1,8 @@
 ---
 name: git-tag
-description: Reads package.json version, synthesizes a change description from git history delta, creates an annotated git tag (no "v" prefix), and pushes it to origin.
+description: Reads version from package.json (Node.js), pyproject.toml (Python), Cargo.toml (Rust), build.gradle (Java/Android), pom.xml (Maven), build.gradle.kts (Gradle Kotlin), pubspec.yaml (Dart), Gemfile (Ruby), or similar package manager files. Synthesizes a change description from git history delta, creates an annotated git tag (no "v" prefix), and pushes it to origin.
 license: BSD 3-Clause
-compatibility: Requires git CLI configured with remote access and a package.json with a "version" field in the working directory.
+compatibility: Requires git CLI configured with remote access and a supported package manager file with a "version" field in the working directory (package.json, pyproject.toml, Cargo.toml, build.gradle, pom.xml, build.gradle.kts, pubspec.yaml, Gemfile, etc.).
 metadata:
   agent: coding
 ---
@@ -13,17 +13,136 @@ You must execute ALL steps in order. Do not stop until the tag is pushed and ver
 
 ## Step 1: Read the Version
 
-Read `package.json` and extract the version string. Use `node` to reliably extract the top-level `version` field (avoids matching nested "version" keys):
+Detect the package manager and extract the version string. Try each file in order until one is found:
+
+### 1a. Node.js (package.json)
+
+If `package.json` exists, use `node` to reliably extract the top-level `version` field (avoids matching nested "version" keys):
 
 ```bash
-TAG_VERSION=$(node -e "console.log(require('./package.json').version)")
-echo "TAG_VERSION=$TAG_VERSION"
+if [ -f package.json ]; then
+  TAG_VERSION=$(node -e "console.log(require('./package.json').version)")
+  echo "TAG_VERSION=$TAG_VERSION"
+  VERSION_SOURCE="package.json"
+fi
 ```
 
-If `node` is unavailable, fall back to a more specific grep:
+If `node` is unavailable, fall back to grep:
 ```bash
 TAG_VERSION=$(grep -m1 '"version"[[:space:]]*:' package.json | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 ```
+
+### 1b. Python (pyproject.toml)
+
+If no `package.json` exists and `pyproject.toml` exists, extract the version from the `[project]` table:
+
+```bash
+if [ -z "$TAG_VERSION" ] && [ -f pyproject.toml ]; then
+  # Try inline version field under [project]
+  TAG_VERSION=$(grep -m1 '^version[[:space:]]*=' pyproject.toml | sed 's/^version[[:space:]]*=[[:space:]]*"\?\([^"]*\)"\?.*/\1/' | tr -d "'")
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+    VERSION_SOURCE="pyproject.toml"
+  fi
+fi
+```
+
+### 1c. Rust (Cargo.toml)
+
+If no version found yet and `Cargo.toml` exists:
+
+```bash
+if [ -z "$TAG_VERSION" ] && [ -f Cargo.toml ]; then
+  TAG_VERSION=$(grep -m1 '^version[[:space:]]*=' Cargo.toml | sed 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/')
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+    VERSION_SOURCE="Cargo.toml"
+  fi
+fi
+```
+
+### 1d. Java/Android/Gradle (build.gradle or build.gradle.kts)
+
+If no version found yet and a Gradle build file exists:
+
+```bash
+if [ -z "$TAG_VERSION" ]; then
+  if [ -f build.gradle ]; then
+    # groovy: version '1.2.3' or version = '1.2.3'
+    TAG_VERSION=$(grep -m1 -E "^\s*(version\s*[=:]?\s*['\"]|version\s+['\"])" build.gradle | sed "s/.*['\"]\\([0-9][0-9a-zA-Z._-]*\\)['\"].*/\\1/")
+    VERSION_SOURCE="build.gradle"
+  elif [ -f build.gradle.kts ]; then
+    # kotlin: version = "1.2.3"
+    TAG_VERSION=$(grep -m1 'version' build.gradle.kts | sed 's/.*version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/' | head -1)
+    VERSION_SOURCE="build.gradle.kts"
+  fi
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+  fi
+fi
+```
+
+### 1e. Java/Maven (pom.xml)
+
+If no version found yet and `pom.xml` exists:
+
+```bash
+if [ -z "$TAG_VERSION" ] && [ -f pom.xml ]; then
+  TAG_VERSION=$(grep -m1 '<version>' pom.xml | sed 's|.*<version>\([^<]*\)</version>.*|\1/' | head -1)
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+    VERSION_SOURCE="pom.xml"
+  fi
+fi
+```
+
+### 1f. Dart (pubspec.yaml)
+
+If no version found yet and `pubspec.yaml` exists:
+
+```bash
+if [ -z "$TAG_VERSION" ] && [ -f pubspec.yaml ]; then
+  TAG_VERSION=$(grep -m1 '^version:' pubspec.yaml | sed 's/^version:[[:space:]]*//' | sed 's/[[:space:]]*$//' | cut -d'+' -f1)
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+    VERSION_SOURCE="pubspec.yaml"
+  fi
+fi
+```
+
+### 1g. Ruby (Gemfile or *.gemspec)
+
+If no version found yet, check Gemfile or gemspec:
+
+```bash
+if [ -z "$TAG_VERSION" ]; then
+  if [ -f *.gemspec ]; then
+    TAG_VERSION=$(grep -m1 '\.version[[:space:]]*=' *.gemspec | sed 's/.*\.version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/' | head -1)
+    if [ -n "$TAG_VERSION" ]; then
+      echo "TAG_VERSION=$TAG_VERSION"
+      VERSION_SOURCE="*.gemspec"
+    fi
+  fi
+fi
+```
+
+### 1h. Swift (Package.swift)
+
+If no version found yet and `Package.swift` exists:
+
+```bash
+if [ -z "$TAG_VERSION" ] && [ -f Package.swift ]; then
+  TAG_VERSION=$(grep -m1 'package\.version' Package.swift | sed 's/.*\.version(\s*"\([^"]*\)".*/\1/' | head -1)
+  if [ -n "$TAG_VERSION" ]; then
+    echo "TAG_VERSION=$TAG_VERSION"
+    VERSION_SOURCE="Package.swift"
+  fi
+fi
+```
+
+### Fallback
+
+If no version was found from any file, report an error and stop. Do not proceed with no version.
 
 ## Step 2: Check Pre-conditions
 
@@ -76,14 +195,15 @@ If either `LOCAL_EXISTS` or `REMOTE_EXISTS` is non-empty, the tag already exists
 
 ## Step 5: Gather Commits for Description
 
-Collect the commit messages between the previous tag and HEAD. **Filter out merge commits** (messages starting with "Merge ") as they add noise:
+Collect the commit messages between the previous tag and HEAD. **Filter out merge commits** (messages starting with "Merge ") as they add noise. Capture into `COMMITS` for use by Step 6:
 
 ```bash
 if [ -n "$PREV_TAG" ]; then
-  git log --pretty=format:"%s" "${PREV_TAG}..HEAD" | grep -v "^Merge "
+  COMMITS=$(git log --pretty=format:"%s" "${PREV_TAG}..HEAD" | grep -v "^Merge ")
 else
-  git log --pretty=format:"%s" --max-count=20 | grep -v "^Merge "
+  COMMITS=$(git log --pretty=format:"%s" --max-count=20 | grep -v "^Merge ")
 fi
+echo "COMMITS=$COMMITS" | head -c 2000
 ```
 
 ## Step 6: Synthesize the Description
@@ -103,22 +223,18 @@ Version 1.3.5 release.
 Includes a Dockerfile fix for the HOME environment variable, expanded scheduler documentation with atomicity directives, and a TUI audit fix proposal. Documentation updates cover config.yaml tracking, TUI command expansion, and scheduler documentation improvements.
 ```
 
-If no commits can be analyzed, use: `"Version ${TAG_VERSION} release."`
-
-## Step 7: Create the Tag
-
-Create an annotated tag. **No "v" prefix.** Use the exact `TAG_VERSION` from Step 1:
+Then synthesize and set `DESCRIPTION`:
 
 ```bash
-git tag -a "<TAG_VERSION>" -m "<DESCRIPTION>"
+if [ -z "$DESCRIPTION" ]; then
+  DESCRIPTION="Version ${TAG_VERSION} release."
+fi
 ```
 
-Replace `<TAG_VERSION>` with the actual version and `<DESCRIPTION>` with the synthesized text from Step 6.
-
-Verify the tag exists:
+If no commits can be analyzed, set DESCRIPTION to:
 
 ```bash
-git tag -n1 | grep "^<TAG_VERSION>"
+DESCRIPTION="Version ${TAG_VERSION} release."
 ```
 
 ## Step 7: Create the Tag
