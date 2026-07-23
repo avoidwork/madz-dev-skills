@@ -221,10 +221,16 @@ The `commit-push` skill will:
 - Commit using conventional commit format from the scanned project rules §5.1
 - Push to the remote
 - Create a PR using the template from the scanned project rules §5.4
+- Output `PR_NUMBER=<number>` (whether newly created or pre-existing)
 
 After `/commit-push` completes, extract the PR number from its output and save it:
 
 ```bash
+PR_NUMBER=$(echo "$COMMIT_PUSH_OUTPUT" | grep -oP 'PR_NUMBER=\K\d+' | head -1)
+if [ -z "$PR_NUMBER" ]; then
+  echo "ERROR: Could not extract PR_NUMBER from commit-push output. Stopping."
+  exit 1
+fi
 echo "$PR_NUMBER" > memory/${SESSION_ID}-pr-number.txt
 ```
 
