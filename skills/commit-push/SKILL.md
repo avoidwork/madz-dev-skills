@@ -115,10 +115,16 @@ git push origin HEAD
 Before creating a new PR, check whether one already exists for this branch.
 
 ```bash
-gh pr list --head "$(git branch --show-current)" --base main --state open --json url --jq '.[0].url'
+EXISTING_PR_URL=$(gh pr list --head "$(git branch --show-current)" --base main --state open --json url --jq '.[0].url')
 ```
 
-- If a URL is returned, **do not create a new PR**. Report the existing PR URL to the user and skip to step 8.
+- If a URL is returned, **do not create a new PR**. Extract the PR number from the URL and output it in a parseable format:
+  ```bash
+  EXISTING_PR_NUMBER=$(echo "$EXISTING_PR_URL" | grep -oP '/pull/\K\d+')
+  echo "PR_NUMBER=$EXISTING_PR_NUMBER"
+  echo "EXISTING_PR=$EXISTING_PR_URL"
+  ```
+  Then skip to step 8.
 - If no URL is returned, proceed to step 7.
 
 ## 7. Open a Pull Request
@@ -139,6 +145,13 @@ Use the project's standard PR tool (usually `gh pr create`).
 
 ```bash
 gh pr create --title "<title>" --body "<body>" --assignee avoidwork
+```
+
+After creating the PR, extract and output the PR number in a parseable format:
+
+```bash
+NEW_PR_NUMBER=$(gh pr list --head "$(git branch --show-current)" --base main --state open --json number --jq '.[0].number')
+echo "PR_NUMBER=$NEW_PR_NUMBER"
 ```
 
 ## 8. Verification
